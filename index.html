@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Swap KI</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .header {
+            background: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background: #007BFF;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            opacity: 0.8;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1;
+        }
+        .modal-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            z-index: 2;
+        }
+        .modal-box h1 {
+            margin-bottom: 15px;
+        }
+        .modal-box .button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Face Swap KI</h1>
+    </div>
+    <div class="content">
+        <h2>Willkommen bei der Face Swap KI</h2>
+        <p>Klicke auf den Button, um mit der Generierung zu starten!</p>
+        <button class="button" onclick="checkLogin()">Generierung starten</button>
+    </div>
+
+    <!-- Modale Box und Hintergrund -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal-box" id="modalBox">
+        <h1>Anmeldung erforderlich</h1>
+        <button class="button" onclick="showLogin()">Jetzt Anmelden</button>
+        <p>Noch nicht registriert? Dann...</p>
+        <button class="button secondary" onclick="showRegister()">Jetzt Registrieren</button>
+    </div>
+
+    <script>
+        function checkLogin() {
+            fetch("/face-swap")
+                .then(response => {
+                    if (response.status === 401) {
+                        // Benutzer ist nicht angemeldet -> Modale Box anzeigen
+                        document.getElementById("modalOverlay").style.display = "block";
+                        document.getElementById("modalBox").style.display = "block";
+                    } else {
+                        // Benutzer ist angemeldet -> Face-Swap-Seite laden
+                        alert("Face-Swap erfolgreich!");
+                    }
+                });
+        }
+
+        function showLogin() {
+            const username = prompt("Benutzername:");
+            const password = prompt("Passwort:");
+            fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Erfolgreich angemeldet!");
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+
+        function showRegister() {
+            const username = prompt("Benutzername:");
+            const password = prompt("Passwort:");
+            fetch("/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Erfolgreich registriert!");
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
